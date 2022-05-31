@@ -1,0 +1,14 @@
+{
+  "name": "image-metadata-viewer",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "_start": "node ./bin/www",
+    "start": "node ./app.js"
+  },
+  "dependencies": {
+    "exif-parser": "^0.1.12",
+    "express": "~4.16.1",
+    "express-fileupload": "^1.4.0"
+  }
+}
