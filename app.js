@@ -1,18 +1,18 @@
 const express = require("express");
-const upload = require("express-fileupload");
+const fileUpload = require("express-fileupload");
 const path = require("path");
 const exif = require("exif-parser");
 const fs = require("fs");
-const crypto = require("crypto");
 
 const app = express();
 const port = 3000;
 
 // app.use(express.limit('50M'));
-app.use(upload({
+app.use(fileUpload({
 	limits: {
-		fileSize: 50000000
-	}
+		fileSize: 1024 * 1024 * 100 // 50MB filesize limit
+	},
+	// abortOnLimit: true
 }));
 
 app.get("/", (req, res) => {
@@ -24,7 +24,7 @@ app.get("/uploads/:fileName", (req, res) => {
 		if (err) {
 			next(err);
 		}
-
+		// if fileTypes.mime
 		const parser = exif.create(buffer);
 
 		try {
@@ -37,14 +37,11 @@ app.get("/uploads/:fileName", (req, res) => {
 });
 
 app.post("/", (req, res, next) => {
-    if (!req.files
-			|| ((req.files.image.mimetype !== "image/jpeg")
-			&& (req.files.image.mimetype !== "image/jpg"))) {
-		res.send({"Bad Request": "Please upload only .jpg or .jpeg files"});
+	if (!req.files || req.files.image.size > 1024*1024*20) {
+		res.status(400).send({"Bad Request": "Upload file is empty or the filesize is >20mb"});
 		next();
 		return;
 	}
-
 	const file = req.files.image;
 	const fileName = file.md5
 
@@ -53,9 +50,9 @@ app.post("/", (req, res, next) => {
 			next(err);
 		}
 
-		res.status(201);
-		res.redirect("/uploads/" + fileName);
+		res.status(201).redirect("/uploads/" + fileName);
 	});
+});
 
 	// const buffer = fs.readFileSync(path.resolve(__dirname, "uploads", fileNameMd5Hash));
 	// const parser = exif.create(buffer);
@@ -67,7 +64,6 @@ app.post("/", (req, res, next) => {
 	// 	res.send({"Bad Request": "File could not be parsed."});
 	// }
 
-});
 
 //Delete uploaded file from server
 // app.use((req, res, next) => {
