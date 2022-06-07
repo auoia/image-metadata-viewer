@@ -8,12 +8,7 @@ const app = express();
 const port = 3000;
 
 // app.use(express.limit('50M'));
-app.use(fileUpload({
-	limits: {
-		fileSize: 1024 * 1024 * 100 // 50MB filesize limit
-	},
-	// abortOnLimit: true
-}));
+app.use(fileUpload);
 
 app.get("/", (req, res) => {
     res.sendFile(path.resolve(__dirname, "index.html"));
